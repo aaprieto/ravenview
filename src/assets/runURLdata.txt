@@ -1,0 +1,8 @@
+Soil Moisture Level
+localhost:3000/api/receiveflagresult/{ "pod": "pod1", "status": "80","machname":"QWERT12345","datetimereceived":"05-24-2018" } 
+
+Air Temperature and Humidity
+localhost:3000/api/receivetemperaturehumidity/{"pod":"pod1","machname":"QWERT12345","datetimereceived":"05-24-2018","aircelsius":"34","airfahrenheit":"88","humidity":"43"} 
+
+Soil Temperature
+localhost:3000/api/receivesoiltemperature/{"pod":"pod1","machname":"QWERT12345","datetimereceived":"05-24-2018","soilcelsius":"34","soilfahrenheit":"88"}

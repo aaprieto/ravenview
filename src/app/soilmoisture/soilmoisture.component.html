@@ -1,0 +1,18 @@
+<div class="container">
+    <div class="row">
+
+
+      <div class="col-sm-12"  align="center"><h3>SOIL MOISTURE LEVEL</h3></div>
+      <div class="col-sm-12"  align="center">
+        <ngx-gauge [type]="gaugeType"
+                   [value]="gaugeValue"
+                   [label]="gaugeLabel"
+                   [append]="gaugeAppendText"
+                   [thresholds]="thresholdConfig"
+                   [thick]="thickConfig"
+                    [size]="sizeConfig">
+        </ngx-gauge>
+      </div>
+    </div>
+</div>
+

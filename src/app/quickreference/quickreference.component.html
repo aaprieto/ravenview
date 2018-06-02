@@ -1,0 +1,146 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12" align="center">
+      <h4>RavenView Dashboard</h4>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="input-group">
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select POD <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li><a (click)="selectPOD('pod1')">Pod 1</a></li>
+            <li><a (click)="selectPOD('pod2')">Pod 2</a></li>
+            <li><a (click)="selectPOD('pod3')">Pod 3</a></li>
+            <li><a (click)="selectPOD('pod4')">Pod 4</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+        </div><!-- /btn-group -->
+        <input type="text" class="form-control" aria-label="..." value="{{podValueDescription}}">
+      </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+  </div><!-- /.row -->
+
+
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">{{podSelectedValueDesc}}</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <a class="navbar-brand" href="#">Machine Serial Number: KV57392KJKH9483</a>
+          <a class="navbar-brand" href="#">Date and Time Retrieved: {{final_d_datetime}} </a>
+          <!--<li class="active"><a href="#">Soil Moisture Humidity <span class="sr-only">(current)</span></a></li>-->
+         <!-- <li><a (click)="selectConf('soil_moisture')">Soil Moisture</a></li>
+          <li><a (click)="selectConf('soil_temperature')">Soil Temperature</a></li>
+          <li><a (click)="selectConf('humidity')">Humidity</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Temperature <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a (click)="selectConf('celsius')">Celsius</a></li>
+              <li><a (click)="selectConf('fahrenheit')">Fahrenheit</a></li>
+
+            </ul>
+          </li>-->
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+
+
+    <div class="container-fluid">
+      <button type="button" class="btn btn-primary btn-primary_loc" (click)="refreshDash()">Refresh</button>
+    </div>
+
+
+
+
+</div>
+
+<div class="container">
+  <div class="row">
+
+
+    <!--<div class="col-sm-12"  align="center"><h3>SOIL MOISTURE LEVEL</h3></div>-->
+    <div class="col-sm-4"  align="center">
+     <!-- <div class="col-sm-6"  align="center"> -->
+        <h3>Soil Moisture Level</h3>
+            <ngx-gauge [type]="gaugeType"
+                       [value]="gaugeValue"
+                       [label]="gaugeLabel"
+                       [append]="gaugeAppendText"
+                       [thresholds]="thresholdConfig"
+                       [thick]="thickConfig"
+                       [size]="sizeConfig">
+            </ngx-gauge>
+    </div>
+
+
+
+
+    <div class="col-sm-4"  align="center">
+      <!-- <div class="col-sm-6"  align="center"> -->
+      <h3>Soil Temp. in Celsius</h3>
+      <h3 class="dashboardfont">{{soiltemp_celsius}}</h3>
+
+    </div>
+    <div class="col-sm-4"  align="center">
+      <!-- <div class="col-sm-6"  align="center"> -->
+      <h3>Soil Temp. in Fahrenheit</h3>
+      <h3 class="dashboardfont">{{soiltemp_fahrenheit}}</h3>
+    </div>
+     <!-- <div class="col-sm-6"  align="center">
+        <h3>SOIL TEMPERATURE</h3></div>
+      </div>-->
+   <!-- </div>--><!-- </div>-->
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+
+
+    <!--<div class="col-sm-12"  align="center"><h3>SOIL MOISTURE LEVEL</h3></div>-->
+    <div class="col-sm-4"  align="center">
+      <!-- <div class="col-sm-6"  align="center"> -->
+      <h3>Air Temp. in Celsius </h3>
+      <h3 class="dashboardfont">{{airtemp_celsius}}</h3>
+
+    </div>
+    <div class="col-sm-4"  align="center">
+      <!-- <div class="col-sm-6"  align="center"> -->
+      <h3>Air Temp. in Fahrenheit</h3>
+      <h3 class="dashboardfont">{{airtemp_fahrenheit}}</h3>
+
+    </div>
+    <div class="col-sm-4"  align="center">
+      <!-- <div class="col-sm-6"  align="center"> -->
+      <h3>Humidity</h3>
+      <h3 class="dashboardfont">{{humidity}}</h3>
+
+    </div>
+    <!-- <div class="col-sm-6"  align="center">
+       <h3>SOIL TEMPERATURE</h3></div>
+     </div>-->
+    <!-- </div>--><!-- </div>-->
+  </div>
+</div>
+
