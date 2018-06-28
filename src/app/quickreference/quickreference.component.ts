@@ -50,7 +50,7 @@ export class QuickreferenceComponent implements OnInit {
   sub2: Subscription;
   constructor(private appservice:QuickreferenceService,
               private router: Router) { }
-
+  // quickreference should be the landing page.
   ngOnInit() {
 
     this.podValueDescription = "";
