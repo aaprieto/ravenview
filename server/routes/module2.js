@@ -3,9 +3,10 @@
  */
 
 module.exports = function(param) {
+  // putting comments for add return of value
     if (param == 'arnold'){
       return 'aprieto';
     } else {
-      return 'Unknown';
+      return 'add';
     }
 };
