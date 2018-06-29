@@ -3,9 +3,10 @@
  */
 
 module.exports = function(param) {
+  // putting comments for add return of value
     if (param == 'arnold'){
       return 'subtract';
     } else {
-      return 'Unknown';
+      return 'add';
     }
 };
