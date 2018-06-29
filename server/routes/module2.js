@@ -4,7 +4,7 @@
 
 module.exports = function(param) {
     if (param == 'arnold'){
-      return 'add';
+      return 'subtract';
     } else {
       return 'Unknown';
     }
