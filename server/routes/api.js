@@ -2,7 +2,43 @@
  * Created by Arnold on 2018-03-30.
  */
 const express = require('express');
-const router = express.Router();
+const router = express.Router()
+const mysql = require('mysql');
+
+
+
+var connection = mysql.createPool({
+  connectionLimit : 50, // Limited to only 50 connections at a time.
+  host     : 'localhost',
+  user     : 'root',
+  password : '',
+  database : 'ravendb'
+});
+
+
+/*   We don't need this I guess
+connection.connect(function(error){
+  if(!!error){
+    console.log('Error');
+  } else {
+    console.log('Connected to mySql');
+  }
+
+});*/
+
+/*
+connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
+  if (error) throw error;
+  console.log('The solution is: ', results[0].solution);
+});
+
+connection.end();
+*/
+
+
+
+
+
 var status = "";
 var airtemphumid = "";
 var soiltemperature = "";
@@ -48,6 +84,36 @@ var objsoilfahrenheit = "";
 router.get('/', function(req, res)  {
   res.send('api works');
 });
+
+
+router.get('/testmysql/:modtest', function(req, res)  {
+  // about module
+  var modtest = req.params.modtest;
+  console.log("modtest: " + modtest);
+  var m2 = require('./module2')(modtest);
+  console.log(m2);
+  //about mysql
+  connection.getConnection(function (error, tempCont) {
+    if(!!error){
+      tempCont.release();
+      console.log('Error');
+    } else {
+          console.log('Connected!');
+          tempCont.query("SELECT * from mysampletable",function(error, rows, fields){
+              tempCont.release();
+              if(!!error){
+                console.log('Error in query');
+              } else {
+                res.json(rows);
+              }
+
+          })
+    }
+  });
+});
+
+
+
 /*  http://172.16.1.80:3000/api/receiveflagresult/{ "pod": "pod1", "status": "80","machname":"QWERT12345","datetimereceived":"05-24-2018" }  --  this is correct*/
 
 router.get('/receiveflagresult/:flag', function(req, res) {
