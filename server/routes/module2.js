@@ -7,6 +7,6 @@ module.exports = function(param) {
     if (param == 'arnold'){
       return 'multiply';
     } else {
-      return 'add';
+      return 'divide';
     }
 };
