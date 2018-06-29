@@ -5,7 +5,7 @@
 module.exports = function(param) {
   // putting comments for add return of value
     if (param == 'arnold'){
-      return 'subtract';
+      return 'multiply';
     } else {
       return 'add';
     }
