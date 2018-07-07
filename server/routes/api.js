@@ -2,40 +2,29 @@
  * Created by Arnold on 2018-03-30.
  */
 const express = require('express');
-const router = express.Router()
-const mysql = require('mysql');
+const router = express.Router();
+const pg = require('pg');
+var async = require("async");
+//const mysql = require('mysql');
 
 
+// note:  all config is optional and the environment variables
+// will be read id the config is not present.
+var config = {
+  user:'postgres',
+  database:'postgres',
+  password:'password',
+  host:'localhost',
+  port:5432,
+  max:10,
+  idleTimeoutMillis:30000,
+};
 
-var connection = mysql.createPool({
-  connectionLimit : 50, // Limited to only 50 connections at a time.
-  host     : 'localhost',
-  user     : 'root',
-  password : '',
-  database : 'ravendb'
-});
-
-
-/*   We don't need this I guess
-connection.connect(function(error){
-  if(!!error){
-    console.log('Error');
-  } else {
-    console.log('Connected to mySql');
-  }
-
-});*/
-
-/*
-connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
-  if (error) throw error;
-  console.log('The solution is: ', results[0].solution);
-});
-
-connection.end();
-*/
-
-
+//  this initializes  connection pool
+//  it will keep idle connections open for a 30 seconds
+//  and set a limit of maximum 10 idle clients.
+var pool = new pg.Pool(config);
+console.log("pool: " + pool);
 
 
 
@@ -81,36 +70,85 @@ var objsoilfahrenheit = "";
  */
 
 
+
 router.get('/', function(req, res)  {
   res.send('api works');
 });
 
 
-router.get('/testmysql/:modtest', function(req, res)  {
-  // about module
-  var modtest = req.params.modtest;
-  console.log("modtest: " + modtest);
-  var m2 = require('./module2')(modtest);
-  console.log(m2);
-  //about mysql
-  connection.getConnection(function (error, tempCont) {
-    if(!!error){
-      tempCont.release();
-      console.log('Error');
-    } else {
-          console.log('Connected!');
-          tempCont.query("SELECT * from mysampletable",function(error, rows, fields){
-              tempCont.release();
-              if(!!error){
-                console.log('Error in query');
-              } else {
-                res.json(rows);
-              }
+router.get('/validatelogin/:clientcode', function(req, res)  {
 
-          })
+
+  // about module
+  var clientcode = req.params.clientcode;
+  var userpadd = clientcode.split("&");
+
+
+
+  //console.log("user: " + userpadd[0]);
+  //console.log("password: " + userpadd[1]);
+  //var m2 = require('./module2')(modtest);
+  //console.log(m2);
+  //about mysql
+
+
+  //  to run a query, we can acquire a client from the pool,
+  //  run a query on the client and then return the client to the pool.
+  pool.connect(function(err, client, done){
+    if(err){
+      return console.error('error fetching client from pool', err);
     }
+
+    client.query("select * from client where clientcode = " + "'" +userpadd[0] + "'",function(err, result){
+      // call 'done()' to release the client back to the pool
+      done();
+      if(err){
+        return console.error('error running query', err);
+      }
+      if(result.rows.length < 1){
+        res.send('[{"result":"error",' +
+          '"message":"Username does not exist" }]')
+        return;
+      }
+      if(result.rows.length > 1){
+        res.send('[{"result":"error",' +
+          '"message":"Multiple Username exist, Check primary unique index" }]')
+        return;
+      }
+
+      var retresult = result.rows[0]["password"].trim();
+      var pass =userpadd[1].trim();
+
+      if (retresult == pass){
+        console.log(result.rows);
+       /* res.send('[{"result":"success",' +
+          '"message":' + '"'+  result.rows + '"' +' }]')*/
+
+        res.send('[{"result":"success",' +
+          '"message":"go for kill" }]');
+
+        }  else {
+
+        res.send('[{"result":"error",' +
+          '"message":"Not a valid Password" }]')
+        return;
+      }
+
+     // console.log(result.rows)
+     // res.send(result.rows);
+    })
   });
+
+  pool.on('error', function(err,client){
+    console.error('idle client error', err.message, err.stack)
+  })
+
+
+
+
+
 });
+
 
 
 

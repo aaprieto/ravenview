@@ -9,7 +9,8 @@ import { QuickreferenceComponent } from './quickreference/quickreference.compone
 // Service
 import {AppService} from "./app.service";
 import { QuickreferenceService } from "./quickreference/quickreference.service"
-
+import {SoilmoistureService} from "./soilmoisture/soilmoisture.service";
+import {LoginService} from "./login/login.service";
 // Utilities
 
 
@@ -17,7 +18,7 @@ import { QuickreferenceService } from "./quickreference/quickreference.service"
 import { routing } from "./app.routing";
 import { SoilmoistureComponent } from './soilmoisture/soilmoisture.component';
 import {NgxGaugeModule} from "ngx-gauge";
-import {SoilmoistureService} from "./soilmoisture/soilmoisture.service";
+import { LoginComponent } from './login/login.component';
 
 
 
@@ -25,7 +26,8 @@ import {SoilmoistureService} from "./soilmoisture/soilmoisture.service";
   declarations: [
     AppComponent,
     QuickreferenceComponent,
-    SoilmoistureComponent
+    SoilmoistureComponent,
+    LoginComponent
   ],
   imports: [
     HttpClientModule,
@@ -36,7 +38,8 @@ import {SoilmoistureService} from "./soilmoisture/soilmoisture.service";
   providers: [
     AppService,
     QuickreferenceService,
-    SoilmoistureService],
+    SoilmoistureService,
+    LoginService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
