@@ -225,4 +225,11 @@ export class QuickreferenceComponent implements OnInit {
   selectConf(arg:string){
     console.log(arg);
   }
+
+  logOut(){
+    localStorage.setItem( 'inp_username','');
+    localStorage.setItem( 'inp_password','');
+    let link = ['/'];
+    this.router.navigate(link);
+  }
 }
