@@ -106,6 +106,7 @@ export class QuickreferenceComponent implements OnInit {
   }
   refreshDash(){
     this.selectPOD(localStorage.getItem('pod'))
+    localStorage.getItem('inp_podid');
   }
 
   selectPOD(pod){

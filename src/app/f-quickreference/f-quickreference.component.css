@@ -1,0 +1,140 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
+
+.sidenav {
+  height: 100%;
+  width: 200px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #ECECEC;
+  overflow-x: hidden;
+  /* padding-top: 20px;*/
+}
+
+.sidenav a {
+  padding: 12px 6px 12px 32px;
+  text-decoration: none;
+  color: #36414C;
+  display: block;
+
+  font-family: "Open Sans"!important;
+  font-size: 15px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: 50px;
+  width: 100%;
+  text-align: left;
+
+}
+
+.sidenav a:hover {
+  color:#FF9E1E;
+}
+
+.main {
+  margin-left: 200px; /* Same as the width of the sidenav */
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+
+.head {
+  background-color: #36414C;
+
+}
+.headbg{
+  background-color: #36414C;
+  color:white!important;
+
+  padding-top: 10px;
+
+}
+.colleft{
+  float: left;
+}
+
+.activebackground {
+  background-color: white;
+  color:#FF9E1E!important;
+}
+.notactivebackground {
+  background-color: #ECECEC;
+  color: #36414C!important;
+}
+.desktop_image {
+  margin-top: -5px;
+  margin-right: 10px;
+}
+
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+.imagemyface {
+  position: absolute;
+  width: 70px!important;
+  height: 70px!important;
+  top: 30px;
+
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  /* background-color: #555;*/
+  color: white;
+  font-size: 9px;
+  /* padding: 12px 24px;*/
+  border: none;
+  cursor: pointer;
+  border-radius: 50px;
+  text-align: center;
+}
+.cover {
+  object-fit:cover;
+}
+
+.imgparent {
+  width:  50px;
+  height: 50px;
+  margin-left: 70px;
+}
+.bg {
+  background-color: #36414C;
+}
+.asty {
+  color: white!important;
+  padding-top: 0px!important;
+}
+
+
+
+.dashboardfont{
+
+  font-size: 100px;
+  display: inline-block;
+}
+.btn-primary_loc{
+  width: 100%;
+}
+
+
+th {
+  background-color: #EEEEEE;
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+
+table {
+  border-spacing: 20px!important;
+  border-collapse: separate!important;
+}

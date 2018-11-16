@@ -3,13 +3,14 @@
  */
 const express = require('express');
 const router = express.Router();
-const pg = require('pg');
+//const pg = require('pg');
 var async = require("async");
-//const mysql = require('mysql');
-
+var mysql = require('mysql');
+var date = require('date-and-time');
 
 // note:  all config is optional and the environment variables
 // will be read id the config is not present.
+/*
 var config = {
   user:'postgres',
   database:'postgres',
@@ -19,12 +20,21 @@ var config = {
   max:10,
   idleTimeoutMillis:30000,
 };
+*/
+
+var pool = mysql.createPool({
+  connectionLimit : 30,
+  host     : 'localhost',
+  user     : 'root',
+  password : 'password',
+  database : 'ravenview'
+});
 
 //  this initializes  connection pool
 //  it will keep idle connections open for a 30 seconds
 //  and set a limit of maximum 10 idle clients.
-var pool = new pg.Pool(config);
-console.log("pool: " + pool);
+//var pool = new pg.Pool(config);
+//console.log("pool: " + pool);
 
 
 
@@ -44,9 +54,11 @@ var objpod = "";
 var objstatus = "";
 var objmachname = "";
 var objdate = "";
+var objuserid = "";
 
 /*  Air Temperature and Humidity */
 var podsAirArr = [];
+var objairuser = "";
 var objairpod = "";
 var objairmachname = "";
 var objairdatetimereceived = "";
@@ -76,200 +88,87 @@ router.get('/', function(req, res)  {
 });
 
 
-router.get('/validatelogin/:clientcode', function(req, res)  {
 
-
-  // about module
-  var clientcode = req.params.clientcode;
-  var userpadd = clientcode.split("&");
-
-
-
-  //console.log("user: " + userpadd[0]);
-  //console.log("password: " + userpadd[1]);
-  //var m2 = require('./module2')(modtest);
-  //console.log(m2);
-  //about mysql
-
-
-  //  to run a query, we can acquire a client from the pool,
-  //  run a query on the client and then return the client to the pool.
-  pool.connect(function(err, client, done){
-    if(err){
-      return console.error('error fetching client from pool', err);
-    }
-
-    client.query("select * from client where clientcode = " + "'" +userpadd[0] + "'",function(err, result){
-      // call 'done()' to release the client back to the pool
-      done();
-      if(err){
-        return console.error('error running query', err);
-      }
-      if(result.rows.length < 1){
-        res.send('[{"result":"error",' +
-          '"message":"Username does not exist" }]')
-        return;
-      }
-      if(result.rows.length > 1){
-        res.send('[{"result":"error",' +
-          '"message":"Multiple Username exist, Check primary unique index" }]')
-        return;
-      }
-
-      var retresult = result.rows[0]["password"].trim();
-      var pass =userpadd[1].trim();
-
-      if (retresult == pass){
-        console.log(result.rows);
-       /* res.send('[{"result":"success",' +
-          '"message":' + '"'+  result.rows + '"' +' }]')*/
-
-        res.send('[{"result":"success",' +
-          '"message":"go for kill" }]');
-
-        }  else {
-
-        res.send('[{"result":"error",' +
-          '"message":"Not a valid Password" }]')
-        return;
-      }
-
-     // console.log(result.rows)
-     // res.send(result.rows);
-    })
-  });
-
-  pool.on('error', function(err,client){
-    console.error('idle client error', err.message, err.stack)
-  })
-
-
-
-
-
-});
-
-
-
-
-/*  http://172.16.1.80:3000/api/receiveflagresult/{ "pod": "pod1", "status": "80","machname":"QWERT12345","datetimereceived":"05-24-2018" }  --  this is correct*/
-
-router.get('/receiveflagresult/:flag', function(req, res) {
-  /*  http://172.16.1.80:3000/api/receiveflagresult/{ "pod": "pod1", "status": "80","machname":"QWERT12345","datetimereceived":"05-24-2018" }  --  this is correct*/
-  status = req.params.flag;
+//////////////////////////////
+//   SOIL MOISTURE          //
+//////////////////////////////
+router.get('/receivesoilmoisture/:param', function(req, res) {
+  /*  http://172.16.1.65:3000/api/receivesoilmoisture/{ "pod": "pod1", "status": "80","machname":"QWERT12345","userid":"arnold.aprieto@gmail.com","datetimereceived":"05-24-2018" }  --  this is correct*/
+  status = req.params.param;
   var obj  = JSON.parse(status);
   objpod = obj.pod;
   objstatus = obj.status;
   objmachname= obj.machname;
   objdate= obj.datetimereceived;
+  objuserid= obj.userid;
 
-  if (podsArr.length >  0) {
-    var flag = false;
-    for (var i = 0; i < podsArr.length; i++) {
-        if (objpod== podsArr[i]["pod"]){
-            podsArr[i]["status"] = objstatus;
-            podsArr[i]["machname"] = objmachname;
-            podsArr[i]["datetimereceived"] = objdate;
-            flag = true;
-        }
-    }
-
-    if (flag == false){
-      var objvalue = new Object();
-      objvalue.pod = obj.pod;
-      objvalue.status = obj.status;
-      objvalue.machname = obj.machname;
-      objvalue.datetimereceived = obj.datetimereceived;
-      podsArr.push(objvalue);
-    }
-  }
-
-  if (podsArr.length < 1){
-    var objvalue = new Object();
-    objvalue.pod = obj.pod;
-    objvalue.status = obj.status;
-    objvalue.machname = obj.machname;
-    objvalue.datetimereceived = obj.datetimereceived;
-    podsArr.push(objvalue);
-  }
-
-  for (var x = 0; x < podsArr.length; x++) {
-   console.log(podsArr[x]["pod"] + "  " + podsArr[x]["status"] + "  " + podsArr[x]["machname"] + "  " + podsArr[x]["datetimereceived"]);
-  }
-
-  console.log("Length: " + podsArr.length);
-  res.send(status);
-});
+  var now = new Date();
 
 
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+       // update user_pods for quick lookup
+      var updsql = 'update user_pods ' +
+          'set soil_moisture_level = "'+ objstatus +'",' +
+          'last_transaction_datetime = "'+ date.format(now, 'YYYY/MM/DD HH:mm:ss') +'" ' +
+          'where user_id = "' + objuserid  + '" and ' +
+          'pod_id = "'+ objpod +'" ';
 
-router.get('/receivetemperaturehumidity/:airtemphumid', function(req, res) {
-   /* localhost:3000/api/receivetemperaturehumidity/{"pod":"pod1","machname":"QWERT12345","datetimereceived":"05-24-2018","aircelsius":"34","airfahrenheit":"88","humidity":"43"}    */
-   airtemphumid = req.params.airtemphumid;
+     // console.log("success update for soil moisture");
+      connection.query(updsql, function (error, results, fields) {
+        // When done with the connection, release it.
+        connection.release();
+        // Handle error after the release.
+        if (error) throw error;
+        //res.send('{"result" : "success"}');
+        // Don't use the connection here, it has been returned to the pool.
+      });
+  });
 
-   var objair  = JSON.parse(airtemphumid);
-   objairpod = objair.pod;
-   objairmachname = objair.machname;
-   objairdatetimereceived = objair.datetimereceived;
-   objaircelsius = objair.aircelsius;
-   objairfahrenheit = objair.airfahrenheit;
-   objairhumidity = objair.humidity;
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+    //  insert new record to history soil moisture.
+    var inssql = 'insert into history_soil_moisture (user_id, pod_id, trans_datetime, soil_moisture_level ) values ("' +objuserid + '","' +objpod + '","' +date.format(now, 'YYYY/MM/DD HH:mm:ss') + '","' + objstatus + '")';
+   // console.log("success insert for soil moisture");
+    // Use the connection
+    connection.query(inssql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
 
+      // Don't use the connection here, it has been returned to the pool.
+    });
+  });
 
-   if (podsAirArr.length >  0) {
-     var flag = false;
-     for (var i = 0; i < podsAirArr.length; i++) {
-       if (objairpod == podsAirArr[i]["pod"]){
-         podsAirArr[i]["machname"] = objairmachname;
-         podsAirArr[i]["datetimereceived"] = objairdatetimereceived;
-         podsAirArr[i]["aircelsius"] = objaircelsius;
-         podsAirArr[i]["airfahrenheit"] = objairfahrenheit;
-         podsAirArr[i]["humidity"] = objairhumidity;
-         flag = true;
-       }
-     }
+  res.send('{"result" : "success"}');
 
-     if (flag == false){
-       var objvalue = new Object();
-       objvalue.pod = objair.pod;
-       objvalue.machname = objair.machname;
-       objvalue.datetimereceived = objair.datetimereceived;
-       objvalue.aircelsius = objair.aircelsius;
-       objvalue.airfahrenheit = objair.airfahrenheit;
-       objvalue.humidity = objair.humidity;
-       podsAirArr.push(objvalue);
-     }
-   }
+    // Use the connection
+    /*connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
 
-   if (podsAirArr.length < 1){
-     var objvalue = new Object();
-     objvalue.pod = objair.pod;
-     objvalue.machname = objair.machname;
-     objvalue.datetimereceived = objair.datetimereceived;
-     objvalue.aircelsius = objair.aircelsius;
-     objvalue.airfahrenheit = objair.airfahrenheit;
-     objvalue.humidity = objair.humidity;
-     podsAirArr.push(objvalue);
-   }
-
+      // Handle error after the release.
+      if (error) throw error;
+      res.send(results);
+      // Don't use the connection here, it has been returned to the pool.
+    });*/
 
 
+  /*console.log(status);
+   res.send(status);*/
 
-   for (var x = 0; x < podsAirArr.length; x++) {
-     console.log(podsAirArr[x]["pod"] + "  " + podsAirArr[x]["machname"] + "  " + podsAirArr[x]["datetimereceived"] + "  " + podsAirArr[x]["aircelsius"] + "  " + podsAirArr[x]["airfahrenheit"] + "  " + podsAirArr[x]["humidity"]);
-   }
-
-   console.log("Length: " + podsAirArr.length);
-   res.send(airtemphumid);
 
 });
 
 
 
-
-router.get('/receivesoiltemperature/:soiltemperature', function(req, res) {
-  /* localhost:3000/api/receivesoiltemperature/{"pod":"pod1","machname":"QWERT12345","datetimereceived":"05-24-2018","soilcelsius":"34","soilfahrenheit":"88"}    */
-  soiltemperature = req.params.soiltemperature;
+//////////////////////////////
+//   SOIL TEMPERATURE       //
+//////////////////////////////
+router.get('/receivesoiltemperature/:param', function(req, res) {
+  /* http://172.16.1.65:3000/api/receivesoiltemperature/{"pod":"pod1","machname":"QWERT12345","datetimereceived":"05-24-2018","userid":"arnold.aprieto@gmail.com","soilcelsius":"34","soilfahrenheit":"88"}    */
+  soiltemperature = req.params.param;
 
   var objsoil  = JSON.parse(soiltemperature);
   objsoilpod = objsoil.pod;
@@ -277,52 +176,353 @@ router.get('/receivesoiltemperature/:soiltemperature', function(req, res) {
   objsoildatetimereceived = objsoil.datetimereceived;
   objsoilcelsius = objsoil.soilcelsius;
   objsoilfahrenheit = objsoil.soilfahrenheit;
+  objuserid  = objsoil.userid;
+
+  var now = new Date();
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+    // update user_pods for quick lookup
+    var updsql = 'update user_pods ' +
+      'set soil_temperature_celsius = "'+ objsoilcelsius +'",' +
+      'soil_temperature_fahrenheit = "'+ objsoilfahrenheit +'",' +
+      'last_transaction_datetime = "'+ date.format(now, 'YYYY/MM/DD HH:mm:ss') +'" ' +
+      'where user_id = "' + objuserid  + '" and ' +
+      'pod_id = "'+ objsoilpod +'" ';
+
+
+    connection.query(updsql, function (error, results, fields) {
+      connection.release();
+      if (error) throw error;
+    });
+  });
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+    //  insert new record to history soil moisture.
+    var inssql = 'insert into history_soil_temperature (user_id, pod_id, trans_datetime, soil_temperature_celsius, soil_temperature_fahrenheit ) values ("' +objuserid + '","' +objsoilpod + '","' +date.format(now, 'YYYY/MM/DD HH:mm:ss') + '","'+objsoilcelsius + '","'  + objsoilfahrenheit + '")';
+   // console.log("success insert for soil temperature");
+    // Use the connection
+    connection.query(inssql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+      // Don't use the connection here, it has been returned to the pool.
+    });
+  });
+
+
+  res.send('{"result" : "success"}');
+});
 
 
 
-  if (podsSoilArr.length >  0) {
-    var flag = false;
-    for (var i = 0; i < podsSoilArr.length; i++) {
-      if (objsoilpod == podsSoilArr[i]["pod"]){
-        podsSoilArr[i]["machname"] = objsoilmachname;
-        podsSoilArr[i]["datetimereceived"] = objsoildatetimereceived;
-        podsSoilArr[i]["soilcelsius"] = objsoilcelsius;
-        podsSoilArr[i]["soilfahrenheit"] = objsoilfahrenheit;
-        flag = true;
+//////////////////////////////
+//   AIR TEMPERATURE        //
+//////////////////////////////
+router.get('/receiveairtemperaturehumidity/:param', function(req, res) {
+  /* localhost:3000/api/receivetemperaturehumidity/{"pod":"pod1","machname":"QWERT12345","datetimereceived":"05-24-2018","aircelsius":"34","airfahrenheit":"88","humidity":"43"}    */
+  /*http://172.16.1.65:3000/api/receivetemperaturehumidity/{"userid":"arnold.aprieto@gmail.com","pod":"pod1","machname":"QWERT12345","datetimereceived":"05-24-2018","aircelsius":"34","airfahrenheit":"88","humidity":"43"}    */
+  airtemphumid = req.params.param;
+
+  var objair = JSON.parse(airtemphumid);
+  objairuserid = objair.userid;
+  objairpod = objair.pod;
+  objairmachname = objair.machname;
+  objairdatetimereceived = objair.datetimereceived;
+  objaircelsius = objair.aircelsius;
+  objairfahrenheit = objair.airfahrenheit;
+  objairhumidity = objair.humidity;
+
+  var now = new Date();
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+    // update user_pods for quick lookup
+    var updsql = 'update user_pods ' +
+      'set air_temperature_celcsius = "'+ objaircelsius +'",' +
+      'air_temperature_fahrenheit = "'+ objairfahrenheit +'",' +
+      'humidity = "'+ objairhumidity +'",' +
+      'last_transaction_datetime = "'+ date.format(now, 'YYYY/MM/DD HH:mm:ss') +'" ' +
+      'where user_id = "' + objairuserid  + '" and ' +
+      'pod_id = "'+ objairpod +'" ';
+
+   // console.log("success update for air temperature");
+    connection.query(updsql, function (error, results, fields) {
+      connection.release();
+      if (error) throw error;
+    });
+  });
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+    //  insert new record to history soil moisture.
+    var inssql = 'insert into history_air_temperature (user_id, pod_id, trans_datetime, air_temperature_celsius, air_temperature_fahrenheit,humidity ) values ("' +objairuserid + '","' +objairpod + '","' +date.format(now, 'YYYY/MM/DD HH:mm:ss') + '","'+objaircelsius + '","'  + objairfahrenheit + '","'  + objairhumidity+'")';
+   // console.log("success insert for air temperature");
+    // Use the connection
+    connection.query(inssql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+      // Don't use the connection here, it has been returned to the pool.
+    });
+  });
+
+
+
+  res.send('{"result" : "success"}');
+});
+
+////////////////////////
+//                    //
+// Validate Login     //
+//                    //
+////////////////////////
+
+
+
+
+router.get('/validatelogin/:param', function(req, res)  {
+
+
+  // about module
+  var clientcode = req.params.param;
+  var userpadd = clientcode.split("&");
+  // console.log(clientcode);
+  var userid = userpadd[0];
+  var password = userpadd[1];
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select * ' +
+      'from users ' +
+      'where user_id =  ' + "'" + userid + "'";
+
+
+
+
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+
+      // get the length of the result from the JSON.parse.
+      var length = 0;
+      for(var k in json_str) if(json_str.hasOwnProperty(k)) length++;
+      //console.log(length);
+
+      if(length < 1){
+        res.send('[{"result":"error",' +
+          '"message":"Username does not exist" }]')
+        return;
       }
-    }
-
-    if (flag == false){
-      var objvalue = new Object();
-      objvalue.pod = objsoil.pod;
-      objvalue.machname = objsoil.machname;
-      objvalue.datetimereceived = objsoil.datetimereceived;
-      objvalue.soilcelsius = objsoil.soilcelsius;
-      objvalue.soilfahrenheit = objsoil.soilfahrenheit;
-
-      podsSoilArr.push(objvalue);
-    }
-  }
-
-  if (podsSoilArr.length < 1){
-    var objvalue = new Object();
-    objvalue.pod = objsoil.pod;
-    objvalue.machname = objsoil.machname;
-    objvalue.datetimereceived = objsoil.datetimereceived;
-    objvalue.soilcelsius = objsoil.soilcelsius;
-    objvalue.soilfahrenheit = objsoil.soilfahrenheit;
-    podsSoilArr.push(objvalue);
-  }
+      if(length > 1){
+        res.send('[{"result":"error",' +
+          '"message":"Multiple Username exist, Check primary unique index" }]')
+        return;
+      }
 
 
+      if (password.trim() == (results[0]["password"]).trim()){
+        res.send('[{"result":"success",' +
+          '"message":"go for the kill" }]');
+        return;
+      }  else {
+        res.send('[{"result":"error",' +
+          '"message":"Not a valid Password" }]')
+        return;
+      }
+    });
+  });
+});
 
 
-  for (var x = 0; x < podsSoilArr.length; x++) {
-    console.log(podsSoilArr[x]["pod"] + "  " + podsSoilArr[x]["machname"] + "  " + podsSoilArr[x]["datetimereceived"] + "  " + podsSoilArr[x]["soilcelsius"] + "  " + podsSoilArr[x]["soilfahrenheit"]);
-  }
+//////////////////////////////////////
+//                                  //
+// Validate Login for Insurance     //
+//                                  //
+//////////////////////////////////////
 
-  console.log("Length: " + podsSoilArr.length);
-  res.send(soiltemperature);
+
+
+
+router.get('/validatelogininsurance/:param', function(req, res)  {
+
+
+  // about module
+  var clientcode = req.params.param;
+  var userpadd = clientcode.split("&");
+  // console.log(clientcode);
+  var userid = userpadd[0];
+  var password = userpadd[1];
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select * ' +
+      'from insurance ' +
+      'where insurance_id =  ' + "'" + userid + "'";
+
+
+
+
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+
+      // get the length of the result from the JSON.parse.
+      var length = 0;
+      for(var k in json_str) if(json_str.hasOwnProperty(k)) length++;
+      //console.log(length);
+
+      if(length < 1){
+        res.send('[{"result":"error",' +
+          '"message":"Username does not exist" }]')
+        return;
+      }
+      if(length > 1){
+        res.send('[{"result":"error",' +
+          '"message":"Multiple Username exist, Check primary unique index" }]')
+        return;
+      }
+
+
+      if (password.trim() == (results[0]["password"]).trim()){
+        res.send('[{"result":"success",' +
+          '"message":"go for the kill" }]');
+        return;
+      }  else {
+        res.send('[{"result":"error",' +
+          '"message":"Not a valid Password" }]')
+        return;
+      }
+    });
+  });
+});
+
+
+
+///////////////////////////////////
+//   Retrieve Users by User ID   //
+///////////////////////////////////
+
+router.get('/retrieveusersbyid/:param', function(req, res) {
+
+  userid = req.params.param;
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select * ' +
+      'from users ' +
+      'where user_id =  ' + "'" + userid + "'";
+
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+      res.send(json_str);
+
+    });
+  });
+
+});
+
+
+//////////////////////////////////////
+//   Retrieve UserPods by User ID   //
+//////////////////////////////////////
+
+router.get('/retrieveuserpodsbyid/:param', function(req, res) {
+
+  userid = req.params.param;
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select * ' +
+      'from user_pods ' +
+      'where user_id =  ' + "'" + userid + "'";
+
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+      res.send(json_str);
+
+    });
+  });
+
+});
+
+////////////////////////////////////////////////
+//   Retrieve UserPods by User ID  and Pod ID //
+////////////////////////////////////////////////
+
+router.get('/retrieveuserpodsbyuseridpodid/:param', function(req, res) {
+
+  var val = req.params.param;
+  var ca = val.split("&");
+  var _userid = ca[0];
+  var _podid = ca[1];
+
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select * ' +
+      'from user_pods ' +
+      'where user_id =  ' + "'" + _userid + "' and " +
+      'pod_id =  ' + "'" + _podid + "'";
+   // console.log(selsql);
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+      res.send(json_str);
+
+    });
+  });
 
 });
 
@@ -330,84 +530,210 @@ router.get('/receivesoiltemperature/:soiltemperature', function(req, res) {
 
 
 
+////////////////////////////////////////////////
+//   Retrieve History by Datefrom, DateTo, User ID, Pod ID //
+////////////////////////////////////////////////
 
+router.get('/retrievesoilmoisturehistory/:param', function(req, res) {
 
-router.get('/retrievesoilmoisturelevel/:pod', function(req, res) {
-  pod = req.params.pod;
-  var retstatuslevel;
-  for (var x = 0; x < podsArr.length; x++) {
-    if (pod ==  podsArr[x]["pod"]){
-      console.log(podsArr[x]["pod"] + "  " + podsArr[x]["status"]);
-      retstatuslevel = podsArr[x]["status"];
-    }
-  }
-
-  const universal_return = '[{"status":"' + retstatuslevel + '"}]';
-  res.send(universal_return);
-
-});
+  var val = req.params.param;
+  var ca = val.split("&");
+  var _datefrom = ca[0];
+  var _dateto = ca[1];
+  var _userid = ca[2];
+  var _podid = ca[3];
 
 
 
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
 
-router.get('/retrieveairtemperaturehumidity/:pod', function(req, res) {
-  var pod = req.params.pod;
-  var machname;
-  var retcelsius;
-  var retfahrenheit;
-  var rethumidity;
-  for (var x = 0; x < podsAirArr.length; x++) {
-    if (pod ==  podsAirArr[x]["pod"]){
-      machname = podsAirArr[x]["machname"];
-      retcelsius = podsAirArr[x]["aircelsius"];
-      retfahrenheit = podsAirArr[x]["airfahrenheit"];
-      rethumidity = podsAirArr[x]["humidity"];
-    }
-  }
+    var selsql = 'select * ' +
+      'from history_soil_moisture ' +
+      'where user_id =  ' + "'" + _userid + "' and " +
+      'pod_id =  ' + "'" + _podid + "' and " +
+      'trans_datetime >=  ' + "'" + _datefrom + "' and " +
+      'trans_datetime <=  ' + "'" + _dateto + "'";
 
-  const universal_return = '{"machname":"' + machname + '","retcelsius":"' + retcelsius+ '","retfahrenheit":"' + retfahrenheit+ '","rethumidity":"' + rethumidity+ '"}';
-  res.send(universal_return);
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
 
-});
+      // console.log(results);
 
+      var json_str = JSON.parse(JSON.stringify(results))
+      res.send(json_str);
 
-
-router.get('/retrievesoiltemperature/:pod', function(req, res) {
-  var pod = req.params.pod;
-  var soilmachname;
-  var soilretcelsius;
-  var soilretfahrenheit;
-console.log("check 1");
-
-  for (var x = 0; x < podsSoilArr.length; x++) {
-    if (pod ==  podsSoilArr[x]["pod"]){
-      soilmachname = podsSoilArr[x]["machname"];
-      soilretcelsius = podsSoilArr[x]["soilcelsius"];
-      soilretfahrenheit = podsSoilArr[x]["soilfahrenheit"];
-    }
-  }
-  console.log("check 2");
-  const universal_return = '{"machname":"' + soilmachname + '","retcelsius":"' + soilretcelsius+ '","retfahrenheit":"' + soilretfahrenheit+ '"}';
-  console.log(universal_return);
-  res.send(universal_return);
+    });
+  });
 
 });
 
 
 
+////////////////////////////////////////////////
+//   Retrieve Soil Temperature  History by Datefrom, DateTo, User ID, Pod ID //
+////////////////////////////////////////////////
 
-router.get('/retrievestatus/:pod1', function(req, res) {
-  const universal_return = '[{"status":"' + status + '"}]';
-  res.send(universal_return);
+router.get('/retrievesoiltemperaturehistory/:param', function(req, res) {
+
+  var val = req.params.param;
+  var ca = val.split("&");
+  var _datefrom = ca[0];
+  var _dateto = ca[1];
+  var _userid = ca[2];
+  var _podid = ca[3];
+
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select * ' +
+      'from history_soil_temperature ' +
+      'where user_id =  ' + "'" + _userid + "' and " +
+      'pod_id =  ' + "'" + _podid + "' and " +
+      'trans_datetime >=  ' + "'" + _datefrom + "' and " +
+      'trans_datetime <=  ' + "'" + _dateto + "'";
+
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+      res.send(json_str);
+
+    });
+  });
 
 });
 
-router.get('/retrievetemperaturehumidity/', function(req, res) {
 
-  const universal_return = '[{"tempdate":"' + tempdate + '"},{"celsius":"' + celsius + '"},{"fahrenheit":"' + fahrenheit + '"},{"humidity":"' + humidity + '"}]';
-  res.send(universal_return);
+
+////////////////////////////////////////////////
+//   Retrieve Air Temperature  History by Datefrom, DateTo, User ID, Pod ID //
+////////////////////////////////////////////////
+
+router.get('/retrieveairtemperaturehistory/:param', function(req, res) {
+
+  var val = req.params.param;
+  var ca = val.split("&");
+  var _datefrom = ca[0];
+  var _dateto = ca[1];
+  var _userid = ca[2];
+  var _podid = ca[3];
+
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select * ' +
+      'from history_air_temperature ' +
+      'where user_id =  ' + "'" + _userid + "' and " +
+      'pod_id =  ' + "'" + _podid + "' and " +
+      'trans_datetime >=  ' + "'" + _datefrom + "' and " +
+      'trans_datetime <=  ' + "'" + _dateto + "'";
+
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+      res.send(json_str);
+
+    });
+  });
 
 });
+
+
+
+////////////////////////////////////////////////
+//   Retrieve Insurance Details   by ID       //
+////////////////////////////////////////////////
+
+
+
+router.get('/retrieveinsurancebyid/:param', function(req, res) {
+
+  insuranceid = req.params.param;
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select * ' +
+      'from insurance ' +
+      'where insurance_id =  ' + "'" + insuranceid + "'";
+
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+      res.send(json_str);
+
+    });
+  });
+
+});
+
+
+////////////////////////////////////////////////
+//   Retrieve users by Insurance ID           //
+////////////////////////////////////////////////
+
+
+
+router.get('/retrieveusersbyinsuranceid/:param', function(req, res) {
+
+  insuranceid = req.params.param;
+
+
+  pool.getConnection(function(err, connection) {
+    if (err) throw err; // not connected!
+
+    var selsql = 'select a.user_id, b.first_name, b.middle_name, b.last_name, b.address, b.city, b. postal_code, b. province, b. longitude, b. latitude, b. phone_number ' +
+      'from insurance_user a, users b ' +
+      'where  a.user_id = b.user_id and ' +
+      'insurance_id =  ' + "'" + insuranceid + "'";
+    // Use the connection
+    connection.query(selsql, function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+      // Handle error after the release.
+      if (error) throw error;
+
+      // console.log(results);
+
+      var json_str = JSON.parse(JSON.stringify(results))
+      res.send(json_str);
+
+    });
+  });
+
+});
+
+
 
 
 module.exports = router;

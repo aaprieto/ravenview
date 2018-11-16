@@ -10,12 +10,18 @@ import {Router} from "@angular/router";
   providers: [LoginService],
 })
 export class LoginComponent implements OnInit {
-  i_uname:string ="";
-  i_password:string ="";
+  //i_uname:string ="";
+  i_uname:string ="arnold.aprieto@gmail.com";
+  //i_password:string ="";
+  i_password:string ="password";
   error_description_login:string = "";
   loginFailed = false;
   private timer;
   private sub4: Subscription;
+  usertype = "";
+  arrlist = [{id: 'farmer',name: "Farmer"},{id: 'insurance',name: "Insurance"}];
+
+
 
 
   constructor(  private router: Router,
@@ -23,16 +29,16 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
   }
-  loginenter(event, _uname, _pswd){
-    console.log(_uname + " : " +  _pswd);
-    if (event.keyCode == 13){
-      console.log(_uname + " : " +  _pswd);
-      this.enterlogin(_uname, _pswd);
-    }
+
+
+
+  changeopt(event){
+    this.usertype = event.target.value;
   }
+
+
+
   enterlogin(_uname, _pswd){
-
-
 
     if (_uname.length < 1){
       this.loginFailed = true;
@@ -48,25 +54,50 @@ export class LoginComponent implements OnInit {
       this.sub4 = this.timer.subscribe(t => this.failedLoginPassword());
       return;
     }
-    this._loginservice.validatelogin(_uname+"&"+_pswd)
-      .subscribe(
-        data => {
-          console.log(data[0]["result"]);
-          if (data[0]["result"] == 'error'){
-            this.loginFailed = true;
-            this.error_description_login = data[0]["message"];
-            this.timer = Observable.timer(3000);
-            this.sub4 = this.timer.subscribe(t => this.failedLoginUserName());
-            return;
-          }
-          if (data[0]["result"] == 'success'){
-            localStorage.setItem( 'inp_username', _uname );
-            localStorage.setItem( 'inp_password', _pswd );
-            let link = ['/quickreference'];
-            this.router.navigate(link);
-          }
-        });
 
+
+    // only works for 'farmer' for now. 'insurance' to follow later.
+    if (this.usertype == 'farmer') {
+      this._loginservice.validatelogin(_uname + "&" + _pswd)
+        .subscribe(
+          data => {
+            if (data[0]["result"] == 'error') {
+              this.loginFailed = true;
+              this.error_description_login = data[0]["message"];
+              this.timer = Observable.timer(3000);
+              this.sub4 = this.timer.subscribe(t => this.failedLoginUserName());
+              return;
+            }
+            if (data[0]["result"] == 'success') {
+              localStorage.setItem('inp_userid', _uname);
+              localStorage.setItem('inp_chosenpodid', '');
+              let link = ['/fquickreference'];
+              this.router.navigate(link);
+            }
+          });
+    }
+
+
+    if (this.usertype == 'insurance') {
+      this._loginservice.validatelogininsurance(_uname + "&" + _pswd)
+        .subscribe(
+          data => {
+            if (data[0]["result"] == 'error') {
+              this.loginFailed = true;
+              this.error_description_login = data[0]["message"];
+              this.timer = Observable.timer(3000);
+              this.sub4 = this.timer.subscribe(t => this.failedLoginUserName());
+              return;
+            }
+            if (data[0]["result"] == 'success') {
+              localStorage.setItem('inp_insuranceid', _uname);
+              localStorage.setItem('inp_userid', '');
+              localStorage.setItem('inp_chosenpodid', '');
+              let link = ['/iuserlist'];
+              this.router.navigate(link);
+            }
+          });
+    }
 
 
 

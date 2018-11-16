@@ -1,0 +1,182 @@
+
+<script src="f-quickreference.component.ts"></script>
+<div class="sidenav">
+  <div  class="headbg">
+
+    <a class="asty">{{firstname}} {{lastname}}</a>
+
+  </div>
+
+
+
+<br>
+
+  <table align="center">
+    <thead>
+    <th id="availablepodtitle">Available Pods</th>
+
+    </thead>
+    <tbody>
+    <tr *ngFor="let pod of arrlistpods">
+
+      <button  type="button" class="btn btn-primary btn-primary_loc" (click)="retrievepoddetails(pod.pod_id)">{{pod.description}}</button>
+
+      <!--<td (click)="retrievepoddetails(pod.pod_id)">{{pod.pod_id}}</td>-->
+    </tr>
+    </tbody>
+  </table>
+
+
+</div>
+
+<div class="main">
+
+ <!-- <h3>{{selectedpod}}</h3>-->
+<br>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-10" align="center">
+        <h4>RavenView Dashboard</h4>
+
+      </div>
+      <div class="col-sm-2" align="right">
+        <button type="button" class="btn btn-primary btn-primary_loc" (click)="logOut()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="input-group">
+          <!--<div class="input-group-btn">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select POD <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+              <li><a (click)="selectPOD('pod1')">Pod 1</a></li>
+              <li><a (click)="selectPOD('pod2')">Pod 2</a></li>
+              <li><a (click)="selectPOD('pod3')">Pod 3</a></li>
+              <li><a (click)="selectPOD('pod4')">Pod 4</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="#">Help</a></li>
+            </ul>
+          </div>&lt;!&ndash; /btn-group &ndash;&gt;-->
+        <!--  <input type="text" class="form-control" aria-label="..." value="{{selectedpod}}">-->
+        </div><!-- /input-group -->
+      </div><!-- /.col-lg-6 -->
+    </div><!-- /.row -->
+
+
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">{{podSelectedValueDesc}}</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+
+            <a class="navbar-brand" href="#">{{selectedpod}}</a>
+            <a class="navbar-brand" href="#">Machine Number:  {{machine_number}}</a>
+            <a class="navbar-brand" href="#">Date and Time Retrieved: {{last_transaction_datetime}} </a>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+    <div class="container-fluid">
+      <button type="button" class="btn btn-primary btn-primary_loc" (click)="refreshDash()">Refresh</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4"  align="center">
+        <h3>Soil Moisture Level</h3>
+        <h3 class="dashboardfont" (click)="viewhistory('soil_moisture')">{{soil_moisture_level}}</h3>
+
+     <!--   <ngx-gauge [type]="gaugeType"
+                   [value]="gaugeValue"
+                   [label]="gaugeLabel"
+                   [append]="gaugeAppendText"
+                   [thresholds]="thresholdConfig"
+                   [thick]="thickConfig"
+                   [size]="sizeConfig">
+        </ngx-gauge>-->
+      </div>
+      <div class="col-sm-4"  align="center">
+        <!-- <div class="col-sm-6"  align="center"> -->
+        <h3>Soil Temp. in Celsius</h3>
+        <h3 class="dashboardfont" (click)="viewhistory('soil_temperature')">{{soil_temperature_celsius}}</h3>
+
+      </div>
+      <div class="col-sm-4"  align="center">
+        <!-- <div class="col-sm-6"  align="center"> -->
+        <h3>Soil Temp. in Fahrenheit</h3>
+        <h3 class="dashboardfont" (click)="viewhistory('soil_temperature')">{{soil_temperature_fahrenheit}}</h3>
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4"  align="center">
+        <button  type="button" class="btn btn-success" (click)="viewhistory('soil_moisture')">View History</button>
+      </div>
+      <div class="col-sm-4"  align="center">
+        <button  type="button" class="btn btn-success"  (click)="viewhistory('soil_temperature')">View History</button>
+      </div>
+      <div class="col-sm-4"  align="center">
+        <button  type="button" class="btn btn-success"  (click)="viewhistory('soil_temperature')">View History</button>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4"  align="center">
+        <!-- <div class="col-sm-6"  align="center"> -->
+        <h3>Air Temp. in Celsius </h3>
+        <h3 class="dashboardfont" (click)="viewhistory('air_temperature')">{{air_temperature_celsius}}</h3>
+
+
+      </div>
+      <div class="col-sm-4"  align="center">
+        <!-- <div class="col-sm-6"  align="center"> -->
+        <h3>Air Temp. in Fahrenheit</h3>
+        <h3 class="dashboardfont" (click)="viewhistory('air_temperature')">{{air_temperature_fahrenheit}}</h3>
+
+
+      </div>
+      <div class="col-sm-4"  align="center">
+        <!-- <div class="col-sm-6"  align="center"> -->
+        <h3>Humidity</h3>
+        <h3 class="dashboardfont" (click)="viewhistory('air_temperature')">{{humidity}}</h3>
+
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-sm-4"  align="center">
+        <button  type="button" class="btn btn-success"  (click)="viewhistory('air_temperature')">View History</button>
+      </div>
+      <div class="col-sm-4"  align="center">
+        <button  type="button" class="btn btn-success" (click)="viewhistory('air_temperature')">View History</button>
+      </div>
+      <div class="col-sm-4"  align="center">
+        <button  type="button" class="btn btn-success" (click)="viewhistory('air_temperature')">View History</button>
+      </div>
+    </div>
+
+  </div>
+
+
+</div>

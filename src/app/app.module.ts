@@ -14,12 +14,23 @@ import {LoginService} from "./login/login.service";
 // Utilities
 
 
-// Routingh
+// Routing
 import { routing } from "./app.routing";
 import { SoilmoistureComponent } from './soilmoisture/soilmoisture.component';
 import {NgxGaugeModule} from "ngx-gauge";
 import { LoginComponent } from './login/login.component';
+import { FQuickreferenceComponent } from './f-quickreference/f-quickreference.component';
+import {FQuickreferenceService} from "./f-quickreference/f-quickreference.service";
 
+//import { DlDateTimePickerDateModule } from 'angular-bootstrap-datetimepicker';
+import { AngularDateTimePickerModule } from 'angular2-datetimepicker';
+import { AgGridModule } from 'ag-grid-angular';
+import { SoiltemperatureComponent } from './soiltemperature/soiltemperature.component';
+import {SoiltemperatureService} from "./soiltemperature/soiltemperature.service";
+import { AirtemperatureComponent } from './airtemperature/airtemperature.component';
+import {AirtemperatureService} from "./airtemperature/airtemperature.service";
+import { IUserlistComponent } from './i-userlist/i-userlist.component';
+import {IUserlistService} from "./i-userlist/i-userlist.service";
 
 
 @NgModule({
@@ -27,19 +38,30 @@ import { LoginComponent } from './login/login.component';
     AppComponent,
     QuickreferenceComponent,
     SoilmoistureComponent,
-    LoginComponent
+    LoginComponent,
+    FQuickreferenceComponent,
+    SoiltemperatureComponent,
+    AirtemperatureComponent,
+    IUserlistComponent
   ],
   imports: [
     HttpClientModule,
     routing,
     BrowserModule,
-    NgxGaugeModule
+    NgxGaugeModule,
+    BrowserModule,
+    AngularDateTimePickerModule,
+    AgGridModule.withComponents(null)
   ],
   providers: [
     AppService,
     QuickreferenceService,
     SoilmoistureService,
-    LoginService],
+    LoginService,
+    FQuickreferenceService,
+    SoiltemperatureService,
+    AirtemperatureService,
+    IUserlistService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

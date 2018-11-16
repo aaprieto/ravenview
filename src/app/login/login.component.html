@@ -9,10 +9,15 @@
 
     <input type="password" [value]="i_password"   (input)="i_password=$event.target.value"  placeholder="Password" class="form-control"  id="pass"  #id_value name="psw" required>
 
+    <div>
+      <h4>Are you a ..... </h4>
+      <select name="users" (change)="changeopt($event)">
+        <option value="">-- Select Type --</option>
+        <option  id="selopt"  *ngFor="let arr of arrlist" [value]="arr.id" >{{arr.name}}</option>
+      </select>
+    </div>
+    <br>
 
-   <!-- <label class="checkbox">
-      <input type="checkbox" value="remember-me" id="rememberMe" name="rememberMe"> Remember me
-    </label>-->
     <button class="btn btn-lg btn-primary btn-block" type="button"  (click)="enterlogin(id_element.value, id_value.value)" >Login</button>
     <label *ngIf="loginFailed" class="logfail" ><b>{{error_description_login}}</b></label>
   </form>

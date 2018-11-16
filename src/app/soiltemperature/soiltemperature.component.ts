@@ -1,17 +1,19 @@
-import {Component, OnInit, AfterContentInit, AfterViewInit, OnChanges} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
 import {Router} from "@angular/router";
-import {SoilmoistureService} from "./soilmoisture.service";
+import {SoiltemperatureService} from "./soiltemperature.service";
 import DateTimeFormat = Intl.DateTimeFormat;
 
 
 
-@Component({
-  selector: 'app-soilmoisture',
-  templateUrl: './soilmoisture.component.html',
-  styleUrls: ['./soilmoisture.component.css']
-})
-export class SoilmoistureComponent implements OnInit{
 
+
+@Component({
+  selector: 'app-soiltemperature',
+  templateUrl: './soiltemperature.component.html',
+  styleUrls: ['./soiltemperature.component.css']
+})
+export class SoiltemperatureComponent implements OnInit {
 
   columnDefs = [
     {headerName: 'Transaction Date', field: 'trans_datetime', cellFormatter: function(data) {
@@ -32,7 +34,8 @@ export class SoilmoistureComponent implements OnInit{
 
 
     }},
-    {headerName: 'Soil Moisture Level', field: 'soil_moisture_level'}
+    {headerName: 'Celsius', field: 'soil_temperature_celsius'},
+    {headerName: 'Fahrenheit', field: 'soil_temperature_fahrenheit'}
 
   ];
 
@@ -57,8 +60,7 @@ export class SoilmoistureComponent implements OnInit{
   inp_dateto = "";
 
   constructor(private router: Router,
-              private soilmoisturelevel:SoilmoistureService) { }
-
+              private _soiltemperatureservice:SoiltemperatureService) { }
   poddescription = "";
   podmachinenumber = "";
 
@@ -86,8 +88,6 @@ export class SoilmoistureComponent implements OnInit{
     localStorage.getItem( 'inp_viewhistory_type');
     localStorage.getItem( 'machinenumber');
     localStorage.getItem( 'pod_description');
-
-
 
   }
   onDateSelectFrom($event){
@@ -123,14 +123,13 @@ export class SoilmoistureComponent implements OnInit{
     this.inp_dateto = inp_year+"-"+inp_month+"-"+inp_day+" "+inp_hours+":"+inp_minutes+":"+inp_seconds;
     console.log(this.inp_dateto);
   }
-
   search(event){
 
     if(this.inp_datefrom > this.inp_dateto){
       alert("Error:  From is greater than to");
     } else {
 
-      this.soilmoisturelevel.retrieveSoilMoistureHistory(this.inp_datefrom + '&' + this.inp_dateto+ '&' + localStorage.getItem('inp_userid') + '&' + localStorage.getItem('inp_podid'))
+      this._soiltemperatureservice.retrieveSoilTemperatureHistory(this.inp_datefrom + '&' + this.inp_dateto+ '&' + localStorage.getItem('inp_userid') + '&' + localStorage.getItem('inp_podid'))
         .subscribe(
           data => {
             console.log(data);
