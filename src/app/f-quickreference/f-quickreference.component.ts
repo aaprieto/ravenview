@@ -16,7 +16,7 @@ export class FQuickreferenceComponent implements OnInit {
   firstname = "";
   lastname = "";
   arrlistpods = [];
-  selectedpod = "";
+  selectedpod = '';
 
  // user:Farmer[] = [];
 
@@ -57,6 +57,9 @@ export class FQuickreferenceComponent implements OnInit {
               newObj["pod_id"] = data2[x]['pod_id'];
               newObj["description"] = data2[x]['description'];
               this.arrlistpods.push(newObj)
+              if(x == 0){
+                this.retrievepoddetails(data2[x]['pod_id']);
+              }
             }
           }
         });
