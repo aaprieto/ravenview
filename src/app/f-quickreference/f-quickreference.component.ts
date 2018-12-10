@@ -100,7 +100,7 @@ export class FQuickreferenceComponent implements OnInit {
 
       }
     }
-    console.log(podid);
+
     localStorage.setItem('inp_podid',podid);
     this.fquickreference.retrieve_userpods_by_userid_and_podid(localStorage.getItem('inp_userid') + '&' + podid)
       .subscribe(
@@ -142,7 +142,7 @@ export class FQuickreferenceComponent implements OnInit {
       alert("Please select Pod");
       return;
     }
-    console.log(type);
+
     localStorage.setItem( 'inp_viewhistory_type',type);
     if(type == "soil_moisture"){
       let link = ['/soilmoisture'];

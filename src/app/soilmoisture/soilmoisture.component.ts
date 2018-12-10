@@ -55,9 +55,54 @@ export class SoilmoistureComponent implements OnInit{
 
   inp_datefrom = "";
   inp_dateto = "";
-
+  dataSource: Object;
   constructor(private router: Router,
-              private soilmoisturelevel:SoilmoistureService) { }
+              private soilmoisturelevel:SoilmoistureService) {
+    this.dataSource = {
+      chart: {
+        "caption": "Countries With Most Oil Reserves [2017-18]",
+        "subCaption": "In MMbbl = One Million barrels",
+        "xAxisName": "Country",
+        "yAxisName": "Reserves (MMbbl)",
+        "numberSuffix": "K",
+        "theme": "fusion",
+      },
+      // Chart Data
+      "data": [{
+        "label": "Venezuela",
+        "value": "290",
+        "transdatetime":"yes"
+      }, {
+        "label": "Saudi",
+        "value": "260",
+        "transdatetime":"yes"
+      }, {
+        "label": "Canada",
+        "value": "180",
+        "transdatetime":"yes"
+      }, {
+        "label": "Iran",
+        "value": "140",
+        "transdatetime":"yes"
+      }, {
+        "label": "Russia",
+        "value": "115",
+        "transdatetime":"yes"
+      }, {
+        "label": "UAE",
+        "value": "100",
+        "transdatetime":"yes"
+      }, {
+        "label": "US",
+        "value": "30",
+        "transdatetime":"yes"
+      }, {
+        "label": "China",
+        "value": "30",
+        "transdatetime":"yes"
+      }]
+    }; // end of this.dataSource
+  }
 
   poddescription = "";
   podmachinenumber = "";
@@ -86,7 +131,6 @@ export class SoilmoistureComponent implements OnInit{
     localStorage.getItem( 'inp_viewhistory_type');
     localStorage.getItem( 'machinenumber');
     localStorage.getItem( 'pod_description');
-
 
 
   }
@@ -133,8 +177,43 @@ export class SoilmoistureComponent implements OnInit{
       this.soilmoisturelevel.retrieveSoilMoistureHistory(this.inp_datefrom + '&' + this.inp_dateto+ '&' + localStorage.getItem('inp_userid') + '&' + localStorage.getItem('inp_podid'))
         .subscribe(
           data => {
-            console.log(data);
+            //console.log(data);
+
             this.rowData = data;
+
+
+
+            // setup for charting
+            //this.dataSource = data;
+
+           /* var res = data.replace("trans_datetime", "label");
+            console.log(res);
+            var final = res.replace("soil_moisture_level", "value");
+            console.log(final);
+            this.dataSource = final;*/
+
+
+
+            var json = JSON.parse(JSON.stringify(data).split('"trans_datetime":').join('"label":'));
+             json = JSON.parse(JSON.stringify(json).split('"soil_moisture_level":').join('"value":'));
+            console.log(JSON.stringify(json));
+
+
+            this.dataSource = {
+              chart: {
+                "caption": "Soil Moisture Level",
+               // "subCaption": "In MMbbl = One Million barrels",
+                "xAxisName": "Date Time",
+                "yAxisName": "Soil Moisture Level",
+               // "numberSuffix": "K",
+                "theme": "fusion",
+              },
+              // Chart Data
+              "data":  json
+            }; // end of this.dataSource
+
+            //this.dataSource = json;
+
           });
 
 
@@ -144,5 +223,13 @@ export class SoilmoistureComponent implements OnInit{
   back(){
     let link = ['/fquickreference'];
     this.router.navigate(link);
+  }
+
+  chart(){
+
+
+    console.log("arnold:"+this.inp_datefrom );
+    console.log("aprieto:"+this.inp_dateto);
+
   }
 }

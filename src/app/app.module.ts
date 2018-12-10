@@ -33,6 +33,17 @@ import { IUserlistComponent } from './i-userlist/i-userlist.component';
 import {IUserlistService} from "./i-userlist/i-userlist.service";
 
 
+
+// In app.module.ts
+import { FusionChartsModule } from 'angular-fusioncharts';
+import FusionCharts from 'fusioncharts/core';
+import Column2D from 'fusioncharts/viz/column2d';
+// Include Below Snippet
+FusionChartsModule.fcRoot(FusionCharts, Column2D);
+
+
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -51,7 +62,8 @@ import {IUserlistService} from "./i-userlist/i-userlist.service";
     NgxGaugeModule,
     BrowserModule,
     AngularDateTimePickerModule,
-    AgGridModule.withComponents(null)
+    AgGridModule.withComponents(null),
+    FusionChartsModule
   ],
   providers: [
     AppService,
