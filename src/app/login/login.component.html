@@ -1,18 +1,19 @@
+<!--
 <div class="wrapper">
   <form class="form-signin">
     <h2 class="form-signin-heading">RavenView Technologies</h2>
-    <!--<input type="text" class="form-control" name="username" placeholder="Username" required="" autofocus="" />-->
+    &lt;!&ndash;<input type="text" class="form-control" name="username" placeholder="Username" required="" autofocus="" />&ndash;&gt;
 
     <input type="text" class="form-control" [value]="i_uname" (input)="i_uname=$event.target.value" id="uname" name="uname" placeholder="Username" #id_element >
 
-    <!--<input type="password" class="form-control" name="password" placeholder="Password" required=""/>-->
+    &lt;!&ndash;<input type="password" class="form-control" name="password" placeholder="password" required=""/>&ndash;&gt;
 
     <input type="password" [value]="i_password"   (input)="i_password=$event.target.value"  placeholder="Password" class="form-control"  id="pass"  #id_value name="psw" required>
 
     <div>
       <h4>Are you a ..... </h4>
       <select name="users" (change)="changeopt($event)">
-        <option value="">-- Select Type --</option>
+        <option value="">&#45;&#45; Select Type &#45;&#45;</option>
         <option  id="selopt"  *ngFor="let arr of arrlist" [value]="arr.id" >{{arr.name}}</option>
       </select>
     </div>
@@ -21,4 +22,26 @@
     <button class="btn btn-lg btn-primary btn-block" type="button"  (click)="enterlogin(id_element.value, id_value.value)" >Login</button>
     <label *ngIf="loginFailed" class="logfail" ><b>{{error_description_login}}</b></label>
   </form>
+</div>
+-->
+<div class="body"></div>
+<div class="grad"></div>
+<div class="header">
+  <div>RavenView<span>Tech</span></div>
+</div>
+<br>
+<div class="login">
+  <input type="text" placeholder="username"[value]="i_uname" (input)="i_uname=$event.target.value" id="uname" name="uname" placeholder="Username" #id_element><br>
+  <input type="password" [value]="i_password"   (input)="i_password=$event.target.value"  placeholder="Password" class="form-control"  id="pass"  #id_value name="psw" required/><br>
+  <div>
+    <!--<h4 class="areyou">Are you a ..... </h4>-->
+    <div class="areyou" >Are you a .....</div>
+    <select name="users" (change)="changeopt($event)" class="fin">
+      <option value="">&#45;&#45; Select Type &#45;&#45;</option>
+      <option  id="selopt"  *ngFor="let arr of arrlist" [value]="arr.id" >{{arr.name}}</option>
+    </select>
+  </div>
+  <label *ngIf="loginFailed" class="logfail" ><b>{{error_description_login}}</b></label>
+  <br>
+  <input type="button" value="Login" (click)="enterlogin(id_element.value, id_value.value)" >
 </div>

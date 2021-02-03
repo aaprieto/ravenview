@@ -30,6 +30,8 @@ var pool = mysql.createPool({
   database : 'ravenview'
 });
 
+
+
 //  this initializes  connection pool
 //  it will keep idle connections open for a 30 seconds
 //  and set a limit of maximum 10 idle clients.
@@ -286,7 +288,7 @@ router.get('/receiveairtemperaturehumidity/:param', function(req, res) {
 
 
 router.get('/validatelogin/:param', function(req, res)  {
-
+  console.log("go here");
 
   // about module
   var clientcode = req.params.param;
@@ -304,7 +306,7 @@ router.get('/validatelogin/:param', function(req, res)  {
       'where user_id =  ' + "'" + userid + "'";
 
 
-
+console.log(selsql);
 
     // Use the connection
     connection.query(selsql, function (error, results, fields) {
@@ -547,7 +549,7 @@ router.get('/retrievesoilmoisturehistory/:param', function(req, res) {
 
   pool.getConnection(function(err, connection) {
     if (err) throw err; // not connected!
-
+  var fArr = [];
     var selsql = 'select * ' +
       'from history_soil_moisture ' +
       'where user_id =  ' + "'" + _userid + "' and " +
@@ -565,6 +567,42 @@ router.get('/retrievesoilmoisturehistory/:param', function(req, res) {
       // console.log(results);
 
       var json_str = JSON.parse(JSON.stringify(results))
+      //console.log(json_str.length);
+
+
+
+      /***********************************************************/
+      var newObj = new Object();
+      for (var i = 0;  i < json_str.length; i++){
+        //console.log((json_str[i]["trans_datetime"]).getDate())
+        var d = new Date(json_str[i]["trans_datetime"]);
+        console.log(d);
+        console.log("Month: " + (d.getMonth() + 1));
+        console.log("Day: " + d.getDate());
+        console.log("year: " + d.getFullYear());
+
+
+        if (i == 0){
+          console.log();
+
+        }else{
+
+        }
+
+      }
+
+
+
+      /************************************************************/
+
+
+
+
+
+
+
+
+
       res.send(json_str);
 
     });

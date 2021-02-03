@@ -11,6 +11,7 @@ import {AppService} from "./app.service";
 import { QuickreferenceService } from "./quickreference/quickreference.service"
 import {SoilmoistureService} from "./soilmoisture/soilmoisture.service";
 import {LoginService} from "./login/login.service";
+import {UserService} from "./services/user.service";
 // Utilities
 
 
@@ -42,6 +43,7 @@ import Column2D from 'fusioncharts/viz/column2d';
 FusionChartsModule.fcRoot(FusionCharts, Column2D);
 
 
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -63,13 +65,15 @@ FusionChartsModule.fcRoot(FusionCharts, Column2D);
     BrowserModule,
     AngularDateTimePickerModule,
     AgGridModule.withComponents(null),
-    FusionChartsModule
+    FusionChartsModule,
+    FormsModule
   ],
   providers: [
     AppService,
     QuickreferenceService,
     SoilmoistureService,
     LoginService,
+    UserService,
     FQuickreferenceService,
     SoiltemperatureService,
     AirtemperatureService,

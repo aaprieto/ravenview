@@ -10,6 +10,7 @@ export class SoilmoistureService {
 
   retrieveSoilMoistureHistory(parms) : Observable<any>  {
     this.url = '/api/retrievesoilmoisturehistory/'+ parms;
+    console.log(this.url)
     return this.http.get(this.url);
 
   }

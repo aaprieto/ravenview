@@ -44,9 +44,9 @@ export class SoilmoistureComponent implements OnInit{
   date_from: Date = new Date();
   date_to: Date = new Date();
   settings = {
-    bigBanner: true,
-    timePicker: true,
-    format: 'MMM-dd-yyyy HH:mm:ss',
+    bigBanner: false,
+    timePicker: false,
+    format: 'MMM-dd-yyyy',
 
     defaultOpen: false,
     closeOnSelect: true
@@ -206,7 +206,7 @@ export class SoilmoistureComponent implements OnInit{
                 "xAxisName": "Date Time",
                 "yAxisName": "Soil Moisture Level",
                // "numberSuffix": "K",
-                "theme": "fusion",
+                "theme": "fusion"
               },
               // Chart Data
               "data":  json
@@ -231,5 +231,9 @@ export class SoilmoistureComponent implements OnInit{
     console.log("arnold:"+this.inp_datefrom );
     console.log("aprieto:"+this.inp_dateto);
 
+  }
+
+  fromdate(){
+    console.log("cliked");
   }
 }
